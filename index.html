@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ironman Group Tracker</title>
+  <meta name="description" content="OSRS Ironman group XP, XP gained, and boss kill count tracker powered by Wise Old Man." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">⚔️</span>
+      <div>
+        <h1>Ironman Group Tracker</h1>
+        <p id="group-subtitle" class="muted">No group loaded yet</p>
+      </div>
+    </div>
+
+    <form id="controls-form" class="controls">
+      <label class="field">
+        <span>WOM Group ID</span>
+        <input id="group-id-input" type="text" inputmode="numeric" placeholder="e.g. 12345" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>XP gained over</span>
+        <select id="period-select">
+          <option value="day">Day</option>
+          <option value="week" selected>Week</option>
+          <option value="month">Month</option>
+          <option value="year">Year</option>
+        </select>
+      </label>
+      <button type="submit" id="load-btn" class="btn btn-primary">Load Group</button>
+      <button type="button" id="refresh-btn" class="btn" disabled title="Re-fetch the latest data from Wise Old Man">⟳ Refresh</button>
+    </form>
+  </header>
+
+  <div id="status-banner" class="status-banner" hidden></div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="dashboard" type="button">Dashboard</button>
+    <button class="tab-btn" data-tab="members" type="button">Members</button>
+    <button class="tab-btn" data-tab="bosses" type="button">Bosses</button>
+    <button class="tab-btn" data-tab="setup" type="button">Help &amp; Setup</button>
+  </nav>
+
+  <main id="app">
+    <section id="tab-dashboard" class="tab-panel">
+      <div id="dashboard-content"></div>
+    </section>
+
+    <section id="tab-members" class="tab-panel" hidden>
+      <div class="panel-toolbar">
+        <input id="member-search" type="search" placeholder="Search members…" />
+      </div>
+      <div id="members-content"></div>
+    </section>
+
+    <section id="tab-bosses" class="tab-panel" hidden>
+      <div class="panel-toolbar">
+        <input id="boss-search" type="search" placeholder="Search bosses…" />
+      </div>
+      <div id="bosses-content"></div>
+    </section>
+
+    <section id="tab-setup" class="tab-panel" hidden>
+      <div class="panel setup-panel">
+        <h2>How to use this app</h2>
+        <ol class="steps">
+          <li>
+            <strong>Create (or find) your group on Wise Old Man.</strong>
+            Go to <a href="https://wiseoldman.net" target="_blank" rel="noopener">wiseoldman.net</a> →
+            <em>Groups</em> → <em>Create group</em>, and add every Ironman's exact in-game name.
+            Already have a group? Open it and copy the number at the end of the URL
+            (<code>wiseoldman.net/groups/<strong>12345</strong></code>) — that's your Group ID.
+          </li>
+          <li>
+            <strong>Install the RuneLite plugin.</strong>
+            In RuneLite, open the <em>Plugin Hub</em> (wrench icon → Plugin Hub), search for
+            <strong>"Wise Old Man"</strong>, and click <em>Install</em>. This keeps everyone's XP and
+            boss kills syncing to Wise Old Man automatically while you play — see the full steps below.
+          </li>
+          <li>
+            <strong>Enter your Group ID above</strong> and click <strong>Load Group</strong>.
+            The app pulls every member's stats straight from Wise Old Man — nothing to install, no login.
+          </li>
+          <li>
+            <strong>Explore the tabs.</strong> <em>Dashboard</em> shows group-wide highlights,
+            <em>Members</em> breaks down XP / XP gained / boss KC per player (click a row to see
+            their full boss list), and <em>Bosses</em> shows the group's combined kill count for
+            every boss, with the top hunter for each.
+          </li>
+          <li>
+            <strong>Keep it fresh.</strong> Click <strong>⟳ Refresh</strong> any time to re-pull the
+            latest data, or change the "XP gained over" dropdown to compare day / week / month / year.
+          </li>
+        </ol>
+      </div>
+
+      <div class="panel setup-panel">
+        <h2>Setting up the RuneLite Wise Old Man plugin</h2>
+        <ol class="steps">
+          <li>Open RuneLite and click the <strong>wrench icon</strong> in the top-right, then the
+            <strong>Plugin Hub</strong> button at the bottom of the sidebar.</li>
+          <li>Search for <strong>Wise Old Man</strong> and click <strong>Install</strong>.</li>
+          <li>Open the plugin's settings (wrench icon → search "Wise Old Man" in your plugin list).</li>
+          <li>Turn on <strong>"Update on login"</strong> (and optionally "Flash update button" or
+            similar reminders) so your profile updates automatically every time you play.</li>
+          <li>You can also click the plugin's sidebar panel icon in-game and press
+            <strong>Update</strong> any time for an instant sync — handy right after a big boss trip.</li>
+          <li>Make sure your RuneLite display name matches the name you added to the WOM group exactly
+            (capitalization doesn't matter, spacing does).</li>
+        </ol>
+        <p class="muted">
+          Every member should install the plugin so the whole group's data stays current — this app
+          only reads from Wise Old Man, it doesn't talk to RuneLite directly.
+        </p>
+      </div>
+
+      <div class="panel setup-panel">
+        <h2>Advanced settings <span class="muted small">(optional)</span></h2>
+        <p class="muted">
+          These are stored only in your browser (never sent anywhere except directly to Wise Old Man)
+          and are not required for normal use.
+        </p>
+        <div class="advanced-grid">
+          <label class="field">
+            <span>WOM API key</span>
+            <input id="api-key-input" type="text" placeholder="Raises the public rate limit" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Group verification code</span>
+            <input id="verification-code-input" type="password" placeholder="Only needed to sync all members" autocomplete="off" />
+          </label>
+        </div>
+        <div class="advanced-actions">
+          <button id="save-advanced-btn" class="btn" type="button">Save</button>
+          <button id="sync-all-btn" class="btn" type="button" disabled title="Load a group first">
+            Sync All Members Now
+          </button>
+        </div>
+        <p id="sync-status" class="muted small"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p class="muted small">
+      Data provided by <a href="https://wiseoldman.net" target="_blank" rel="noopener">Wise Old Man</a>.
+      Not affiliated with Jagex or RuneLite.
+    </p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
