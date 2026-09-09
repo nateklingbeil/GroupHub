@@ -1,4 +1,4 @@
-# GroupHub — OSRS Ironman Group Tracker
+# Iron Ledger — OSRS Ironman Group Tracker
 
 A small, static web app for Old School RuneScape Ironman groups. It shows each
 member's total XP, XP gained over a period, and boss kill counts, plus the
@@ -32,23 +32,30 @@ just a webpage.
    boss kills sync automatically every time you play. Full details are in
    the app's **Help & Setup** tab.
 
-3. **Run the app.** No build step needed — it's plain HTML/CSS/JS. Pick one:
+3. **Host it somewhere your group can reach.** No build step needed — it's
+   plain HTML/CSS/JS. Pick one:
 
-   - **Easiest:** serve the folder with any static file server, e.g.
+   - **Netlify (recommended)** — free, and gives you a clean URL like
+     `iron-ledger.netlify.app` instead of one buried in your GitHub username.
+     Go to [app.netlify.com](https://app.netlify.com) → **Add new site** →
+     **Import an existing project** → connect GitHub → pick this repo.
+     Leave the build command blank and the publish directory as `.` (root),
+     then deploy. Once it's live, go to **Site configuration → Change site
+     name** to pick your own subdomain. Every push to `main` redeploys it
+     automatically.
+   - **GitHub Pages** — also free: push this repo to GitHub, then enable
+     Pages (Settings → Pages → deploy from the `main` branch). The URL will
+     look like `<your-username>.github.io/<repo-name>`.
+   - **Local testing:** serve the folder with any static file server, e.g.
      ```bash
-     cd GroupHub
+     cd iron-ledger
      python3 -m http.server 8000
      ```
      then open <http://localhost:8000> in your browser.
-   - **VS Code:** right-click `index.html` → "Open with Live Server"
-     (if you have the Live Server extension).
-   - **GitHub Pages:** push this repo to GitHub, then enable Pages
-     (Settings → Pages → deploy from the `main` branch), and share the
-     resulting URL with your group.
 
    > Opening `index.html` directly by double-clicking usually works too,
-   > but a local server avoids any browser quirks with cross-origin
-   > requests, so it's the safer option.
+   > but a local server (or real hosting) avoids any browser quirks with
+   > cross-origin requests, so it's the safer option.
 
 4. **Enter your Group ID** in the app and click **Load Group**. That's it —
    every member's XP, XP gained, and boss kills load straight from Wise Old
