@@ -11,6 +11,7 @@ const el = {
   periodSelect: document.getElementById("period-select"),
   loadBtn: document.getElementById("load-btn"),
   refreshBtn: document.getElementById("refresh-btn"),
+  copyLinkBtn: document.getElementById("copy-link-btn"),
   statusBanner: document.getElementById("status-banner"),
   groupSubtitle: document.getElementById("group-subtitle"),
   tabs: document.getElementById("tabs"),
@@ -95,6 +96,7 @@ function renderAll() {
   if (cache.group) {
     el.groupSubtitle.textContent = `${cache.group.name} — ${cache.group.memberCount} members`;
     el.refreshBtn.disabled = state.loading;
+    el.copyLinkBtn.disabled = state.loading;
     el.syncAllBtn.disabled = state.loading;
     el.syncAllBtn.title = "";
   } else {
@@ -252,6 +254,26 @@ function setSort(sortState, key) {
   }
 }
 
+el.copyLinkBtn.addEventListener("click", async () => {
+  if (!cache.group) return;
+  const url = new URL(location.href);
+  url.search = "";
+  url.searchParams.set("group", cache.group.id);
+  url.searchParams.set("period", el.periodSelect.value);
+  const shareUrl = url.toString();
+
+  const original = el.copyLinkBtn.textContent;
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    el.copyLinkBtn.textContent = "Copied!";
+  } catch {
+    window.prompt("Copy this link to share with your group:", shareUrl);
+  }
+  setTimeout(() => {
+    el.copyLinkBtn.textContent = original;
+  }, 1500);
+});
+
 el.saveAdvancedBtn.addEventListener("click", () => {
   config.apiKey = el.apiKeyInput.value.trim();
   config.verificationCode = el.verificationCodeInput.value.trim();
@@ -284,8 +306,24 @@ el.syncAllBtn.addEventListener("click", async () => {
 
 // -------------------------------------------------------------- Autoload
 
-if (config.groupId) {
-  loadFull(config.groupId);
+// A shared link like ?group=12345&period=month lets teammates land straight
+// on the group's data with nothing to type. It takes priority over whatever
+// was previously saved in this browser, and gets saved as the new default
+// once it loads successfully (see loadFull).
+const urlParams = new URLSearchParams(location.search);
+const urlGroupId = urlParams.get("group");
+const urlPeriod = urlParams.get("period");
+
+if (urlPeriod && ["day", "week", "month", "year"].includes(urlPeriod)) {
+  el.periodSelect.value = urlPeriod;
+}
+if (urlGroupId) {
+  el.groupIdInput.value = urlGroupId;
+}
+
+const initialGroupId = urlGroupId || config.groupId;
+if (initialGroupId) {
+  loadFull(initialGroupId);
 } else {
   renderAll();
 }
